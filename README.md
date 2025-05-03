@@ -1,54 +1,57 @@
-# React + TypeScript + Vite
+![React js](https://github.com/user-attachments/assets/aad144ca-30cf-4d21-b73c-a0c728fbd926)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[Watch](https://youtu.be/vgm93eRxuW8)
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
 ```
+  const {
+    data,
+    isError,
+    isFetcing,
+    isPending,
+    isQueryUp,
+    hasData,
+    handleFetchNextPage,
+    refetch,
+  } = usePagination<PostProps>({
+    url: '/posts',
+    pageIncrement: () => +20,
+    enabled: true,
+    useScrolltoEnd: false,
+    initialPage: 0,
+    params: { _limit: "20" },
+  });
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+  if (!isQueryUp) {
+    return <button onClick={refetch}>Get your posts</button>;
+  }
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+  if (isPending) {
+    return <h1>Please wait</h1>;
+  }
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+  if (isError || !data) {
+    return <h1>Unexcepted error occured</h1>;
+  }
+
+  return (
+    <>
+      <ul>
+        {data.map((item) => {
+          return (
+            <li key={item.id}>
+              <b>{item.id}</b> {item.title}
+            </li>
+          );
+        })}
+      </ul>
+      {isFetcing && <p>Loading your posts...</p>}
+      {hasData ? (
+        <button disabled={isFetcing} onClick={handleFetchNextPage}>
+          {isFetcing ? "Please wait..." : "Load More"}
+        </button>
+      ) : (
+        <p style={{marginBlockStart: 10}}>Reached end of the page</p>
+      )}
+    </>
+  );
 ```
